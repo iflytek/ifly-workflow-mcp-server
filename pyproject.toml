@@ -1,0 +1,25 @@
+[project]
+name = "ifly-workflow-mcp-server"
+version = "0.0.1"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp>=1.1.2",
+    "omegaconf>=2.3.0",
+    "pip>=24.3.1",
+    "pytest>=8.3.5",
+    "python-dotenv>=1.0.1",
+    "requests",
+]
+
+[build-system]
+requires = ["hatchling", ]
+build-backend = "hatchling.build"
+
+[project.scripts]
+mcp_server = "mcp_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_server"]
