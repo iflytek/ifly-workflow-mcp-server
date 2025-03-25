@@ -8,7 +8,7 @@ from src.mcp_server.server import ifly_workflow_api
 def test_chat():
 
     resp = ifly_workflow_api.chat_message(
-        ifly_workflow_api.data[2],
+        ifly_workflow_api.data[0],
         {
             "AGENT_USER_INPUT": "a picture of a cat"
         }

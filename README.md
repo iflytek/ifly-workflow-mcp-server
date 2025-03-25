@@ -71,12 +71,6 @@ Before using the mcp server, you should prepare a config.yaml to save your workf
   name: 'flow name'
   description: 'flow description'
   api_key: 'key:secret'
-  params:
-    - name: 'input key name'
-      type: 'string'
-      description: 'input key description'
-      required: true
-
 ```
 
 

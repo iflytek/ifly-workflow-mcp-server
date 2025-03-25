@@ -2,8 +2,8 @@ import asyncio
 import json
 import os
 from abc import ABC
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Iterator
+from dataclasses import field
+from typing import Dict, Any, Iterator
 
 import mcp.server.stdio
 import mcp.types as types
@@ -11,58 +11,65 @@ import requests
 from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 from omegaconf import OmegaConf
+from pydantic import BaseModel
 
 
-@dataclass
-class Param:
-    name: str
-    type: str
-    description: str
-    required: bool
-
-
-@dataclass
-class Flow:
+class Flow(BaseModel):
     flow_id: str
-    name: str
-    description: str
+    name: str = ''
+    description: str = ''
     api_key: str
-    params: List[Param] = field(default_factory=list)
+    input_schema: dict[str, Any] = field(default_factory=dict)
+    """A JSON Schema object defining the expected parameters for the tool."""
 
 
 class IFlyWorkflowAPI(ABC):
+    base_url = "https://xingchen-api.xf-yun.com"
+
     def __init__(self, config_path: str):
         if not config_path:
             raise ValueError("config path not provided")
 
-        self.base_url = "https://xingchen-api.xf-yun.com"
-        self.data = self._load_flows_from_yaml(config_path)
+        self.flows = [Flow(**flow) for flow in OmegaConf.load(config_path)]
         self.name_idx: Dict[str, int] = {}
 
-        # add sys_upload_file tool
-        self.data.append(
+        # get flow info
+        for flow in self.flows:
+            flow_info = self.get_flow_info(flow.flow_id, flow.api_key)
+            flow.name = flow.name if flow.name else flow_info["data"]["name"]
+            flow.description = flow.description if flow.description else flow_info["data"]["description"]
+            flow.input_schema = flow_info["data"]["inputSchema"]
+
+        self._add_sys_tool()
+
+        # build name_idx
+        for i, flow in enumerate(self.flows):
+            self.name_idx[flow.name] = i
+
+    def _add_sys_tool(self):
+        """
+        add default sys tools
+        :return:
+        """
+        self.flows.append(
+            # add sys_upload_file
             Flow(
                 flow_id="sys_upload_file",
                 name="sys_upload_file",
-                api_key=self.data[0].api_key,
+                api_key=self.flows[0].api_key,
                 description="upload file. Format support: image(jpg、png、bmp、jpeg), doc(pdf)",
-                params=[Param(
-                    name="file",
-                    type="string",
-                    description="file path",
-                    required=True
-                )],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "file": {
+                            "type": "string",
+                            "description": "file path"
+                        }
+                    },
+                    "required": ["file"]
+                }
             )
         )
-
-        # build name_idx
-        for i, flow in enumerate(self.data):
-            self.name_idx[flow.name] = i
-
-    @staticmethod
-    def _load_flows_from_yaml(file_path: str) -> List[Flow]:
-        data = OmegaConf.load(file_path)
-        return [Flow(**flow) for flow in data]
 
     def chat_message(
             self,
@@ -119,18 +126,20 @@ class IFlyWorkflowAPI(ABC):
     ) -> Dict[str, Any]:
         """
         get flow info, such as flow description, parameters
-        # TODO To be called in the future
         :param flow_id:
         :param api_key:
         :return:
         """
-        url = f"{self.base_url}/workflow/v1/flows/{flow_id}"
+        url = f"{self.base_url}/workflow/v1/get_flow_info/{flow_id}"
         headers = {
             "Authorization": f"Bearer {api_key}"
         }
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        return response.json()
+        json_data = response.json()
+        if json_data.get("code", 0) != 0:
+            raise ValueError(json_data)
+        return json_data
 
     def upload_file(
             self,
@@ -161,23 +170,12 @@ async def handle_list_tools() -> list[types.Tool]:
     :return:
     """
     tools = []
-    for i, flow in enumerate(ifly_workflow_api.data):
-        inputSchema = {
-            "type": "object",
-            "properties": {
-                param.name: {
-                    "type": param.type,
-                    "description": param.description
-                } for param in flow.params
-            },
-            "required": [param.name for param in flow.params if param.required]
-        }
-
+    for i, flow in enumerate(ifly_workflow_api.flows):
         tools.append(
             types.Tool(
                 name=flow.name,
                 description=flow.description,
-                inputSchema=inputSchema,
+                inputSchema=flow.input_schema,
             )
         )
     return tools
@@ -195,7 +193,7 @@ async def handle_call_tool(
     """
     if name not in ifly_workflow_api.name_idx:
         raise ValueError(f"Unknown tool: {name}")
-    flow = ifly_workflow_api.data[ifly_workflow_api.name_idx[name]]
+    flow = ifly_workflow_api.flows[ifly_workflow_api.name_idx[name]]
     if name == "sys_upload_file":
         data = ifly_workflow_api.upload_file(
             flow.api_key,
