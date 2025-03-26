@@ -1,7 +1,7 @@
 [project]
 name = "ifly-workflow-mcp-server"
-version = "0.0.1"
-description = "Add your description here"
+version = "1.0.0"
+description = "This a simple implementation of an MCP server using iFlytek. It enables calling iFlytek workflows through MCP tools."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

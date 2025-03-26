@@ -3,6 +3,8 @@ import logging
 from mcp import ClientSession, StdioServerParameters, types
 from mcp.client.stdio import stdio_client
 
+from mcp_server.entities.ifly_client import SysTool
+
 # Create server parameters for stdio connection
 server_params = StdioServerParameters(
     command="python",  # Executable
@@ -41,7 +43,7 @@ async def run():
             logging.info(f"tools: {tools}")
 
             # Call a tool
-            sys_upload_file_result = await session.call_tool("sys_upload_file", arguments={"file": "/Users/hygao1024/Documents/iFlytek/Work/测试图片.jpg"})
+            sys_upload_file_result = await session.call_tool(SysTool.SYS_UPLOAD_FILE.value, arguments={"file": "/Users/hygao1024/Documents/iFlytek/Work/测试图片.jpg"})
             logging.info(f"call sys_upload_file result: {sys_upload_file_result}")
 
             image_generator_result = await session.call_tool("image_generator", arguments={"AGENT_USER_INPUT": "你好"})

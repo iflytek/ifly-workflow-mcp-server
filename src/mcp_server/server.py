@@ -1,5 +1,4 @@
 import asyncio
-import os
 from typing import Iterator
 
 import mcp.server.stdio
@@ -7,11 +6,10 @@ import mcp.types as types
 from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 
-from mcp_server.entities.workflow_api import IFlyWorkflowAPI
+from mcp_server.entities.ifly_client import IFlyWorkflowClient, SysTool
 
-config_path = os.getenv("CONFIG_PATH")
 server = Server("ifly_workflow_mcp_server")
-ifly_workflow_api = IFlyWorkflowAPI(config_path)
+ifly_client = IFlyWorkflowClient()
 
 
 @server.list_tools()
@@ -21,7 +19,7 @@ async def handle_list_tools() -> list[types.Tool]:
     :return:
     """
     tools = []
-    for i, flow in enumerate(ifly_workflow_api.flows):
+    for i, flow in enumerate(ifly_client.flows):
         tools.append(
             types.Tool(
                 name=flow.name,
@@ -42,16 +40,16 @@ async def handle_call_tool(
     :param arguments:   tool arguments
     :return:
     """
-    if name not in ifly_workflow_api.name_idx:
-        raise ValueError(f"Unknown tool: {name}")
-    flow = ifly_workflow_api.flows[ifly_workflow_api.name_idx[name]]
-    if name == "sys_upload_file":
-        data = ifly_workflow_api.upload_file(
+    if name not in ifly_client.name_idx:
+        raise ValueError(f"Invalid tool name: {name}")
+    flow = ifly_client.flows[ifly_client.name_idx[name]]
+    if name == SysTool.SYS_UPLOAD_FILE.value:
+        data = ifly_client.upload_file(
             flow.api_key,
             arguments["file"],
         )
     else:
-        data = ifly_workflow_api.chat_message(
+        data = ifly_client.chat_message(
             flow,
             arguments,
         )

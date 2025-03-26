@@ -1,5 +1,7 @@
 import json
+import os
 from abc import ABC
+from enum import Enum
 from typing import Dict, Any
 
 import requests
@@ -8,12 +10,24 @@ from omegaconf import OmegaConf
 from mcp_server.entities.flow import Flow
 
 
-class IFlyWorkflowAPI(ABC):
+class SysTool(Enum):
+    """
+    sys tools enum
+    """
+    SYS_UPLOAD_FILE = "SYS_UPLOAD_FILE"
+    """ Workflow provides file upload """
+
+
+class IFlyWorkflowClient(ABC):
     base_url = "https://xingchen-api.xf-yun.com"
 
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: str = os.getenv("CONFIG_PATH")):
+        """
+        init
+        :param config_path: config path，default is CONFIG_PATH
+        """
         if not config_path:
-            raise ValueError("config path not provided")
+            raise ValueError("CONFIG_PATH is not set")
 
         self.flows = [Flow(**flow) for flow in OmegaConf.load(config_path)]
         self.name_idx: Dict[str, int] = {}
@@ -39,8 +53,8 @@ class IFlyWorkflowAPI(ABC):
         self.flows.append(
             # add sys_upload_file
             Flow(
-                flow_id="sys_upload_file",
-                name="sys_upload_file",
+                flow_id=SysTool.SYS_UPLOAD_FILE.value,
+                name=SysTool.SYS_UPLOAD_FILE.value,
                 api_key=self.flows[0].api_key,
                 description="upload file. Format support: image(jpg、png、bmp、jpeg), doc(pdf)",
                 input_schema={
