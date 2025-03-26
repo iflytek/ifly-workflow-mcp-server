@@ -67,10 +67,10 @@ This system is built on the iFlytek MCP server and enables intelligent workflow 
 Before using the mcp server, you should prepare a config.yaml to save your workflow info. The example config like this:
 
 ```yaml
-- flow_id: 'flow id'
-  name: 'flow name'
-  description: 'flow description'
-  api_key: 'key:secret'
+- flow_id: 'flow id'              # required
+  name: 'flow name'               # optional, if not set, will get name from flow info api.
+  description: 'flow description' # optional, if not set, will get description from flow info api.
+  api_key: 'key:secret'           # required
 ```
 
 
