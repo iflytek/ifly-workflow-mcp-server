@@ -68,13 +68,25 @@ Before using the mcp server, you should prepare a config.yaml to save your workf
 
 ```yaml
 - flow_id: 'flow id'              # required
-  name: 'flow name'               # optional, if not set, will get name from flow info api.
-  description: 'flow description' # optional, if not set, will get description from flow info api.
-  api_key: 'key:secret'           # required
+  name: 'flow name'               # optional, if not set, obtain the name from the cloud.
+  description: 'flow description' # optional, if not set, obtain the description from the cloud.
+  api_key: 'API Key:API Secret'   # required
 ```
 
+#### Workflow authentication information retrieval
+1. [Create a bot](https://xinghuo.xfyun.cn/botcenter/createbot)
+![](http://sgw-dx.xf-yun.com/api/v1/spkdesk2/c5e0b69f-ed09-44fd-9d52-8abfa6df58b1.png?authorization=c2ltcGxlLWp3dCBhaz1zcGtkZXNrMmQ0YzM1YjBjO2V4cD0xOTAwNzYwNTUwO2FsZ289aG1hYy1zaGEyNTY7c2lnPTRENitYWjB0RTRhaktKWExzNFR4ZmJGRWJiZWgzZVJIN2Q1bnB5T1h1dlU9&x_location=7YfQJjZB7uKtx2GYyYUle5D=)
 
-
+2. Publish a workflow
+- **Step 1.** Debug the workflow you just created.
+- **Step 2.** Engage in a conversation with your workflow and ensure the conversation is successful.
+- **Step 3.** You can now click the publish button.
+![](http://sgw-dx.xf-yun.com/api/v1/spkdesk2/c4e9b86a-56ad-4059-95c9-f725118fbb94.png?authorization=c2ltcGxlLWp3dCBhaz1zcGtkZXNrMmQ0YzM1YjBjO2V4cD0xOTAwNzYwODk1O2FsZ289aG1hYy1zaGEyNTY7c2lnPWpFN3krRmdjU2NvZ0hSZzVGVkplcWRyUlY1Y1NySk05cGV3Skd0b25jWTg9&x_location=7YfQJjZB7uKtx2GYyYUle5D=)
+- **Step 4.** Select "Publish as API" and click the "Configure" button.
+![](http://sgw-dx.xf-yun.com/api/v1/spkdesk2/0840e1fc-0b45-4913-9f43-e95bd5ed10a0.png?authorization=c2ltcGxlLWp3dCBhaz1zcGtkZXNrMmQ0YzM1YjBjO2V4cD0xOTAwNzYxMTkzO2FsZ289aG1hYy1zaGEyNTY7c2lnPXpXWk1aZjN1a2hBajBNeGVvcFViWnhMRngreHdyK3JvbUF5a2ZVNDhXWVE9&x_location=7YfQJjZB7uKtx2GYyYUle5D=)
+- **Step 5.** Select the application you need to bind and bind it. Now you can retrieve the corresponding workflow ID and authentication information. Enjoy!
+![](http://sgw-dx.xf-yun.com/api/v1/spkdesk2/d4a95e4f-5d11-43ac-84c1-1216b90fa928.png?authorization=c2ltcGxlLWp3dCBhaz1zcGtkZXNrMmQ0YzM1YjBjO2V4cD0xOTAwNzYxNjg4O2FsZ289aG1hYy1zaGEyNTY7c2lnPUVvSFVVSUVmRW14WWlCSGU1ejkvVzhrYzdHZTlPT0N5aFhtUndkZmFSTzA9&x_location=7YfQJjZB7uKtx2GYyYUle5D=)
+> **Note**: If you find that you are unable to select an app, you can go to https://www.xfyun.cn to apply.
 ### Manual Installation
 
 To add a persistent client, add the following to your `claude_desktop_config.json` or `mcp.json` file:
@@ -120,7 +132,3 @@ Example config:
 ```
 
 
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/zcaceres/markdownify-mcp/blob/main/LICENSE) file for details.
