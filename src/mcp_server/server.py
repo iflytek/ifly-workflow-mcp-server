@@ -1,4 +1,6 @@
 import asyncio
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Iterator
 
 import mcp.server.stdio
@@ -8,8 +10,15 @@ from mcp.server.models import InitializationOptions
 
 from mcp_server.entities.ifly_client import IFlyWorkflowClient, SysTool
 
-server = Server("ifly_workflow_mcp_server")
-ifly_client = IFlyWorkflowClient()
+
+@asynccontextmanager
+async def server_lifespan(server: Server) -> AsyncIterator[dict]:
+    """Manage server startup and shutdown lifecycle."""
+    # Initialize resources on startup
+    yield {"ifly_client": IFlyWorkflowClient()}
+
+
+server = Server("ifly_workflow_mcp_server", lifespan=server_lifespan)
 
 
 @server.list_tools()
@@ -19,7 +28,8 @@ async def handle_list_tools() -> list[types.Tool]:
     :return:
     """
     tools = []
-    for i, flow in enumerate(ifly_client.flows):
+    ctx = server.request_context
+    for i, flow in enumerate(ctx.lifespan_context["ifly_client"].flows):
         tools.append(
             types.Tool(
                 name=flow.name,
@@ -40,6 +50,7 @@ async def handle_call_tool(
     :param arguments:   tool arguments
     :return:
     """
+    ifly_client = server.request_context.lifespan_context["ifly_client"]
     if name not in ifly_client.name_idx:
         raise ValueError(f"Invalid tool name: {name}")
     flow = ifly_client.flows[ifly_client.name_idx[name]]
