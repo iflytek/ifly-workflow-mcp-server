@@ -5,13 +5,13 @@ description = "This a simple implementation of an MCP server using iFlytek. It e
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "httpx>=0.28.1",
-    "mcp>=1.1.2",
-    "omegaconf>=2.3.0",
-    "pip>=24.3.1",
-    "pytest>=8.3.5",
-    "python-dotenv>=1.0.1",
-    "requests",
+    "httpx==0.28.1",
+    "mcp==1.5.0",
+    "omegaconf==2.3.0",
+    "pip==25.0.1",
+    "pytest==8.3.5",
+    "python-dotenv==1.0.1",
+    "requests==2.32.3",
 ]
 
 [build-system]

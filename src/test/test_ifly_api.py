@@ -2,11 +2,10 @@ import logging
 
 from typing import Iterator
 
-from src.mcp_server.server import ifly_client
-
 
 def test_chat():
-
+    from mcp_server.entities.ifly_client import IFlyWorkflowClient
+    ifly_client = IFlyWorkflowClient()
     resp = ifly_client.chat_message(
         ifly_client.flows[0],
         {
