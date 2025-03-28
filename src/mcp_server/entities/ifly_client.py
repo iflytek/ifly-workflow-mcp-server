@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Dict, Any
 
 import requests
-from omegaconf import OmegaConf
+import yaml
 
 from mcp_server.entities.flow import Flow
 
@@ -29,7 +29,8 @@ class IFlyWorkflowClient(ABC):
         if not config_path:
             raise ValueError("CONFIG_PATH is not set")
 
-        self.flows = [Flow(**flow) for flow in OmegaConf.load(config_path)]
+        with open(config_path, 'r', encoding='utf-8') as file:
+            self.flows = [Flow(**flow) for flow in yaml.safe_load(file)]
         self.name_idx: Dict[str, int] = {}
 
         # get flow info

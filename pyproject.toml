@@ -7,11 +7,11 @@ requires-python = ">=3.11"
 dependencies = [
     "httpx==0.28.1",
     "mcp==1.5.0",
-    "omegaconf==2.3.0",
     "pip==25.0.1",
     "pytest==8.3.5",
     "python-dotenv==1.0.1",
     "requests==2.32.3",
+    "pyyaml==6.0.2"
 ]
 
 [build-system]
